@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/notificacionFragment"
+        android:icon="@drawable/ic_notifications"
+        android:title="@string/noti_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/fragmentMap"
+        android:icon="@drawable/ic_map"
+        android:title="@string/map_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/reporteFragment"
+        android:icon="@drawable/perfil"
+        android:title="@string/article_title"
+        app:showAsAction="never" />
+</menu>

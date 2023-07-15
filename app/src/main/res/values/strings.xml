@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Tracking</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="user_hint">usuario</string>
+    <string name="card_required">required</string>
+    <string name="card_password">password</string>
+    <string name="noti_title">ordenes</string>
+    <string name="map_title">map</string>
+    <string name="article_title">perfil</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    card_password
+</resources>

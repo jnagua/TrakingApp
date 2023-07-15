@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragmentMap">
+
+    <fragment
+        android:id="@+id/fragmentLogin"
+        android:name="com.example.tracking.ui.FragmentLogin"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_fragmentLogin_to_fragmentMap"
+            app:destination="@id/fragmentMap"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentMap"
+        android:name="com.example.tracking.ui.FragmentMap"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_fragmentMap_to_fragmentLogin"
+            app:destination="@id/fragmentLogin"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/reporteFragment"
+        android:name="com.example.tracking.ui.ReporteFragment"
+        android:label="fragment_reporte"
+        tools:layout="@layout/fragment_reporte" />
+    <fragment
+        android:id="@+id/notificacionFragment"
+        android:name="com.example.tracking.ui.NotificacionFragment"
+        android:label="fragment_notificacion"
+        tools:layout="@layout/fragment_notificacion" >
+        <action
+            android:id="@+id/action_notificacionFragment_to_fragmentMap"
+            app:destination="@id/fragmentMap" />
+    </fragment>
+</navigation>
