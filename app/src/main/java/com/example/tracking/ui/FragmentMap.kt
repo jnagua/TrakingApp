@@ -81,6 +81,7 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
         viewModel= ViewModelProvider(this.requireActivity()).get(MapViewModel::class.java)
         repo=(this.activity as MainActivity).repo
 
+
     }
 
     override fun onCreateView(
@@ -101,7 +102,10 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
             setUpObservableClient()
             isClient(view,savedInstanceState)
         }
-
+        if(FragmentMapArgs.fromBundle(requireArguments()).timer){
+            count=0
+            hyrule()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -276,7 +280,7 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
         setUpObservable()
         if ((this.activity as MainActivity).pref.getString("rol","")!="" && Storage.getNumeroOrden()==""){
             count=0
-            viewModel.setUser(User((this.activity as MainActivity).pref.getString("id","")!!,"Bearer ${(this.activity as MainActivity).pref.getString("token","")!!}"))
+            hyrule()
         }
         mBinding.btnCalculateRoute.setOnClickListener {
             if(::mMap.isInitialized){
@@ -317,6 +321,59 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
 
 
 
+
+    }
+
+    private fun hyrule(){
+        val fragment =this
+        if(count==0){
+            lifecycleScope.launch{
+
+                var result= withContext(Dispatchers.IO){
+                    repo.getOrdenActiva("Bearer ${(fragment.activity as MainActivity).pref.getString("token","")!!}",
+                        LoginUser((fragment.activity as MainActivity).pref.getString("id","")!!,""))
+                }
+                when(result){
+                    is Resource.Success -> {
+                        if(  result.data.error==null){
+                            Snackbar.make(
+                                mBinding.root, "Tiene una orden en Proceso",
+                                BaseTransientBottomBar.LENGTH_LONG
+                            ).show()
+                            Storage.setNumeroOrden("${result.data.orden.id}")
+                            (fragment.activity as MainActivity).editor.putString("idOrden","${result.data.orden.id}")
+                            (fragment.activity as MainActivity).idOrden=result.data.orden.id
+                            Storage.setLatitud(result.data.orden.latitud)
+                            Storage.setLongitud(result.data.orden.longitud)
+                            (fragment.activity as MainActivity).getLoacation()
+                            (fragment.activity as MainActivity).mCountDownTimer.start()
+                            if(::mMap.isInitialized){
+                                val marcador = LatLng(result.data.orden.latitud.toDouble(),  result.data.orden.longitud.toDouble())
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marcador,DEFAULT_ZOOM))
+                                mMap.addMarker(MarkerOptions().position(marcador).title("lugar de destino")
+                                )
+                            }
+                        }
+
+                    }
+                    is Resource.Failure ->{
+                        if(result.exception.message=="HTTP 403 Forbidden"){
+                            (fragment.activity as MainActivity).deleteSharePrefences()
+                            findNavController().navigate(FragmentMapDirections.actionFragmentMapToFragmentLogin())
+                        }else{
+                            if(count==0){
+                                Log.d("Jamil","${result.exception.message}")
+
+                                Toast.makeText(fragment.requireContext(),"${result.exception}",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                    is Resource.Loading ->{
+                    }
+                }
+            }
+        }
 
     }
     private fun inicarSeguimiento(){

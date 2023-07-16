@@ -36,6 +36,10 @@ class OrdenesAdapter (private var ordenes:List<OrdenesData>,private val ordenesO
         with(holder){
             if(Storage.getNumeroOrden()==orden.numeroOrdem){
                 binding.card.setBackgroundColor(Color.GREEN)
+
+            }
+            else{
+                binding.card.setBackgroundColor(0x00000000)
             }
             binding.idTextView.text = orden.numeroOrdem
             binding.idTextView1.text = orden.destino

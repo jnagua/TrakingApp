@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -26,12 +27,16 @@ import com.example.tracking.R
 import com.example.tracking.data.Storage
 import com.example.tracking.data.model.DataUpdate
 import com.example.tracking.data.model.Entrega
+import com.example.tracking.data.model.LoginUser
 import com.example.tracking.data.model.OrdenesData
 import com.example.tracking.data.model.User
 import com.example.tracking.databinding.FragmentNotificacionBinding
 import com.example.tracking.domin.RepoImpl
 import com.example.tracking.ui.viewmodel.NotificacionViewModel
 import com.example.tracking.vo.Resource
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -84,10 +89,11 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
         super.onViewCreated(view, savedInstanceState)
         startRecyclerView()
         setUpObservable()
-        viewModel.setOrdenes(User((this.activity as MainActivity).pref.getString("id","")!!,"Bearer ${(this.activity as MainActivity).pref.getString("token","")!!}"))
+        zelda()
         mBinding.swipeLayoute.setOnRefreshListener{
+            count=0
             mBinding.swipeLayoute.isRefreshing=false
-            viewModel.setOrdenes(User((this.activity as MainActivity).pref.getString("id","")!!,"Bearer ${(this.activity as MainActivity).pref.getString("token","")!!}"))
+            zelda()
         }
         //var lista = ArrayList<OrdenesData>()
         //lista.add(OrdenesData("123","guayaqil"))
@@ -214,7 +220,8 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
                 is Resource.Success ->{
                     if(count==0){
                     if(result.data.orden.estado=="EP"){
-                        findNavController().navigate(R.id.action_notificacionFragment_to_fragmentMap)
+                        val action=NotificacionFragmentDirections.actionNotificacionFragmentToFragmentMap(true)
+                        findNavController().navigate(action)
                     }
                     }
 
@@ -307,4 +314,46 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
 
         }
     }
+
+    private fun zelda(){
+        val fragment =this
+        if(count==0){
+            lifecycleScope.launch{
+
+                var result= withContext(Dispatchers.IO){
+                    repo.getOrdenes("Bearer ${(fragment.activity as MainActivity).pref.getString("token","")!!}",LoginUser((fragment.activity as MainActivity).pref.getString("id","")!!,""))
+                }
+                when(result){
+                    is Resource.Success -> {
+                        dialog.dismiss()
+                        var lista = ArrayList<OrdenesData>()
+                        result.data.orders.forEach {
+                            lista.add(OrdenesData(it.id,it.destination,it.destinoLongitud,it.destinoLatitud))
+                        }
+                        ordenAdapter.setOrdenes(lista)
+                        if(ordenAdapter.itemCount==0){
+                            mBinding.recyclerView.visibility=View.GONE
+                            mBinding.textNoOrdenes.visibility=View.VISIBLE
+                        }else{
+                            mBinding.recyclerView.visibility=View.VISIBLE
+                            mBinding.textNoOrdenes.visibility=View.GONE
+                        }
+                    }
+                    is Resource.Failure ->{
+                        dialog.dismiss()
+                        Snackbar.make(
+                            mBinding.root, "error en la base",
+                            BaseTransientBottomBar.LENGTH_LONG
+                        ).show()
+                        mBinding.recyclerView.visibility=View.GONE
+                        mBinding.textNoOrdenes.visibility=View.VISIBLE
+                    }
+                    is Resource.Loading ->{
+                        dialog.show()
+                    }
+                }
+            }
+        }
+    }
+
 }
