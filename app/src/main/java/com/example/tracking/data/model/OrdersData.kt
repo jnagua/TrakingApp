@@ -29,7 +29,13 @@ data class Orders(
     @SerializedName("destination_coord_long")
     val destinoLongitud:String,
     @SerializedName("is_active")
-    val isActivo:Boolean
+    val isActivo:Boolean,
+    @SerializedName("peso")
+    val peso:Float,
+    @SerializedName("order_file")
+    val files:String,
+
+
     )
 data class Client(
     @SerializedName("identification")

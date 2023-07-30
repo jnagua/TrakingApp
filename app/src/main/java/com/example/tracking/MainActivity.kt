@@ -396,18 +396,20 @@ override fun onSupportNavigateUp(): Boolean {
             locationByNetwork = lastKnownLocationByNetwork
         }
 //------------------------------------------------------//
-        if (locationByGps != null && locationByNetwork != null) {
-            if (locationByGps.accuracy > locationByNetwork!!.accuracy) {
-                currentLocation = locationByGps
+        if (::locationByGps.isInitialized && ::locationByNetwork.isInitialized) {
+            if (locationByGps != null && locationByNetwork != null) {
+                if (locationByGps.accuracy > locationByNetwork!!.accuracy) {
+                    currentLocation = locationByGps
 
-                myLatitud = currentLocation!!.latitude
-                myLongitud = currentLocation!!.longitude
-                // use latitude and longitude as per your need
-            } else {
-                currentLocation = locationByNetwork
-                myLatitud = currentLocation!!.latitude
-                myLongitud = currentLocation!!.longitude
-                // use latitude and longitude as per your need
+                    myLatitud = currentLocation!!.latitude
+                    myLongitud = currentLocation!!.longitude
+                    // use latitude and longitude as per your need
+                } else {
+                    currentLocation = locationByNetwork
+                    myLatitud = currentLocation!!.latitude
+                    myLongitud = currentLocation!!.longitude
+                    // use latitude and longitude as per your need
+                }
             }
         }
 }

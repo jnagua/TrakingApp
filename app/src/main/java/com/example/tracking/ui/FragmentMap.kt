@@ -102,10 +102,6 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
             setUpObservableClient()
             isClient(view,savedInstanceState)
         }
-        if(FragmentMapArgs.fromBundle(requireArguments()).timer){
-            count=0
-            hyrule()
-        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

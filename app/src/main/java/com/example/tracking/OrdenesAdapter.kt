@@ -19,6 +19,7 @@ class OrdenesAdapter (private var ordenes:List<OrdenesData>,private val ordenesO
         fun onOrdenesClick(numeroOrden:String)
         fun onImprevistoClick(numeroOrden:String)
         fun onAceptClick(longitud :String,latitud :String,numeroOrden:String)
+        fun onPdf(pdf:String)
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
@@ -35,27 +36,33 @@ class OrdenesAdapter (private var ordenes:List<OrdenesData>,private val ordenesO
         val orden = ordenes.get(position)
         with(holder){
             if(Storage.getNumeroOrden()==orden.numeroOrdem){
-                binding.card.setBackgroundColor(Color.GREEN)
+                binding.card.setBackgroundColor(Color.parseColor("#75D681"))
 
             }
             else{
                 binding.card.setBackgroundColor(0x00000000)
             }
-            binding.idTextView.text = orden.numeroOrdem
-            binding.idTextView1.text = orden.destino
-            binding.editarImage.setOnClickListener {
+            binding.ordenId.text = orden.numeroOrdem
+            binding.destino.text = orden.destino
+            binding.destinatario.text=orden.cliente
+            binding.Descripcion.text="${orden.peso} de ${orden.contenido}"
+            binding.check.setOnClickListener {
                 ordenesOnClickListener.onOrdenesClick(orden.numeroOrdem)
             }
-            binding.eliminarImage.setOnClickListener {
+            binding.delete.setOnClickListener {
                 ordenesOnClickListener.onImprevistoClick(orden.numeroOrdem)
             }
             binding.card.setOnClickListener {
                 //binding.card.setBackgroundColor(Color.GREEN)
                 ordenesOnClickListener.onAceptClick(orden.destinoLong,orden.destinoLat,orden.numeroOrdem)
             }
+            binding.pdf.setOnClickListener {
+                //binding.card.setBackgroundColor(Color.GREEN)
+                ordenesOnClickListener.onPdf(orden.files)
+            }
             if(bandera){
-                binding.editarImage.visibility=View.GONE
-                    binding.eliminarImage.visibility=View.GONE
+                binding.check.visibility=View.GONE
+                    binding.delete.visibility=View.GONE
             }
 
         }
