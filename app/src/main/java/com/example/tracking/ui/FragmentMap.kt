@@ -274,10 +274,7 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
     private fun isDriver(view: View, savedInstanceState: Bundle?){
         initMap(view,savedInstanceState)
         setUpObservable()
-        if ((this.activity as MainActivity).pref.getString("rol","")!="" && Storage.getNumeroOrden()==""){
-            count=0
-            hyrule()
-        }
+        hyrule()
         mBinding.btnCalculateRoute.setOnClickListener {
             if(::mMap.isInitialized){
                 if(Storage.getLongitud()!="" && Storage.getLatitud()!=""){
@@ -322,14 +319,12 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
 
     private fun hyrule(){
         val fragment =this
-        if(count==0){
-            lifecycleScope.launch{
-
-                var result= withContext(Dispatchers.IO){
-                    repo.getOrdenActiva("Bearer ${(fragment.activity as MainActivity).pref.getString("token","")!!}",
-                        LoginUser((fragment.activity as MainActivity).pref.getString("id","")!!,""))
-                }
-                when(result){
+        lifecycleScope.launch{
+            var result= withContext(Dispatchers.IO){
+                repo.getOrdenActiva("Bearer ${(fragment.activity as MainActivity).pref.getString("token","")!!}",
+                    LoginUser((fragment.activity as MainActivity).pref.getString("id","")!!,""))
+            }
+            when(result){
                     is Resource.Success -> {
                         if(  result.data.error==null){
                             Snackbar.make(
@@ -369,7 +364,6 @@ class FragmentMap : Fragment(), OnMapReadyCallback {
                     }
                 }
             }
-        }
 
     }
     private fun inicarSeguimiento(){

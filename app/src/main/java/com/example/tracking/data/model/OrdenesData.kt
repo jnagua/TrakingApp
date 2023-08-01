@@ -10,4 +10,5 @@ data class OrdenesData(
                        val contenido: String="-80.0625025",
                        val peso:Float=0f,
                        val files:String,
+                       val estado:String
                        )

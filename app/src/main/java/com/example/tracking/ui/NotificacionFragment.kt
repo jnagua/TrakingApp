@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -114,18 +115,13 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
 
     }
 
-    private fun createDialog(numeroOrden: String) {
+    private fun createDialog(numeroOrden: String,estado:String) {
         dialogView = layoutInflater.inflate(R.layout.formulario_final, null)
         alertDialog =
             MaterialAlertDialogBuilder(requireContext()).setTitle("Confirmacion de entrega")
                 .setView(dialogView)
                 .setPositiveButton("enviar", { dialogInterface, i ->
-                    if (Storage.getNumeroOrden() == "") {
-                        Snackbar.make(
-                            mBinding.root, "no tiene orden en proceso",
-                            BaseTransientBottomBar.LENGTH_LONG
-                        ).show()
-                    } else if (Storage.getNumeroOrden() == numeroOrden) {
+                    if (estado =="EP") {
                         updateOrden(numeroOrden,"FN")
                         enviarFormulario(dialogView,numeroOrden,false)
                     } else {
@@ -188,7 +184,8 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
                                 it.client.name,
                                 it.content,
                                 it.peso,
-                                it.files
+                                it.files,
+                                it.status
                             )
                         )
                     }
@@ -252,8 +249,8 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
 
     }
 
-    override fun onOrdenesClick(numeroOrden: String) {
-        createDialog(numeroOrden)
+    override fun onOrdenesClick(numeroOrden: String,estado:String) {
+        createDialog(numeroOrden,estado)
 
     }
 
@@ -261,8 +258,8 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
         createDialogInforme(numeroOrden)
     }
 
-    override fun onAceptClick(longitud: String, latitud: String, numeroOrden: String) {
-        if(Storage.getNumeroOrden()==numeroOrden){
+    override fun onAceptClick(longitud: String, latitud: String, numeroOrden: String,enProceso:String) {
+        if(enProceso==""){
             if ((this.activity as MainActivity).pref.getString("rol", "") == "Drive") {
                 var builder = MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Comenzar Recorrido")
@@ -387,7 +384,8 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
                                 it.client.name,
                                 it.content,
                                 it.peso,
-                                it.files
+                                it.files,
+                                it.status
                             )
                         )
                     }
@@ -429,13 +427,11 @@ class NotificacionFragment : Fragment(), OrdenesAdapter.OrdenesOnClickListener {
             }
             when (result) {
                 is Resource.Success -> {
-                    if (result.data.orden.estado == "EP") {
                         val action =
                             NotificacionFragmentDirections.actionNotificacionFragmentToFragmentMap(
                                 true
                             )
                         findNavController().navigate(action)
-                    }
                 }
 
                 is Resource.Failure -> {

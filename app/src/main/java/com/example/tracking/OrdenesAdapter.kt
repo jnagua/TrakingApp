@@ -14,11 +14,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class OrdenesAdapter (private var ordenes:List<OrdenesData>,private val ordenesOnClickListener:OrdenesOnClickListener,private var bandera:Boolean) : RecyclerView.Adapter<OrdenesAdapter.ViewHolder>(){
 
     private lateinit var mContext: Context
+    private  var enProceso:String=""
 
     interface OrdenesOnClickListener{
-        fun onOrdenesClick(numeroOrden:String)
+        fun onOrdenesClick(numeroOrden:String,estado:String)
         fun onImprevistoClick(numeroOrden:String)
-        fun onAceptClick(longitud :String,latitud :String,numeroOrden:String)
+        fun onAceptClick(longitud :String,latitud :String,numeroOrden:String,enProceso:String)
         fun onPdf(pdf:String)
     }
 
@@ -47,14 +48,14 @@ class OrdenesAdapter (private var ordenes:List<OrdenesData>,private val ordenesO
             binding.destinatario.text=orden.cliente
             binding.Descripcion.text="${orden.peso} de ${orden.contenido}"
             binding.check.setOnClickListener {
-                ordenesOnClickListener.onOrdenesClick(orden.numeroOrdem)
+                ordenesOnClickListener.onOrdenesClick(orden.numeroOrdem,orden.estado)
             }
             binding.delete.setOnClickListener {
                 ordenesOnClickListener.onImprevistoClick(orden.numeroOrdem)
             }
             binding.card.setOnClickListener {
                 //binding.card.setBackgroundColor(Color.GREEN)
-                ordenesOnClickListener.onAceptClick(orden.destinoLong,orden.destinoLat,orden.numeroOrdem)
+                ordenesOnClickListener.onAceptClick(orden.destinoLong,orden.destinoLat,orden.numeroOrdem,enProceso)
             }
             binding.pdf.setOnClickListener {
                 //binding.card.setBackgroundColor(Color.GREEN)
@@ -71,9 +72,11 @@ class OrdenesAdapter (private var ordenes:List<OrdenesData>,private val ordenesO
     }
     fun setOrdenes(ordenes: List<OrdenesData>) {
         this.ordenes = ordenes
+        ordenes.forEach { e->
+            if(e.estado.equals("EP"))
+                enProceso=e.numeroOrdem
+        }
         notifyDataSetChanged()
     }
-
-
     override fun getItemCount(): Int = ordenes.size
 }
